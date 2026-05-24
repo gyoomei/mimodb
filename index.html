@@ -5,324 +5,283 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MiMoDB — AI-Powered Database Explorer</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;510;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#02040a;--bg2:#0a0c14;--bg3:#12141e;--bg4:#1a1c28;--bg5:#22243a;
   --text:#e4e6ed;--text2:#9ca3b4;--text3:#6b7280;
-  --accent:#6366f1;--accent2:#818cf8;--accent-glow:rgba(99,102,241,.15);
-  --green:#10b981;--red:#ef4444;--yellow:#f59e0b;--cyan:#06b6d4;--pink:#ec4899;--orange:#f97316;
+  --accent:#6366f1;--accent2:#818cf8;--cyan:#06b6d4;--green:#10b981;--red:#ef4444;--yellow:#f59e0b;--pink:#ec4899;
   --border:rgba(99,102,241,.12);--border2:rgba(255,255,255,.06);
-  --glass:rgba(10,12,20,.72);--glass-border:rgba(99,102,241,.18);
+  --glass:rgba(10,12,20,.85);
   --radius:12px;--radius-sm:8px;--radius-lg:16px;
-  --shadow:0 8px 32px rgba(0,0,0,.4);
-  --font:'Inter',-apple-system,sans-serif;
-  --mono:'JetBrains Mono',monospace;
+  --font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;
 }
 [data-theme="light"]{
-  --bg:#f8f9fc;--bg2:#ffffff;--bg3:#f1f3f9;--bg4:#e8eaf2;--bg5:#dde0ea;
+  --bg:#f5f6fa;--bg2:#ffffff;--bg3:#eef0f6;--bg4:#e2e5ef;--bg5:#d5d9e8;
   --text:#1a1c2e;--text2:#4b5563;--text3:#9ca3af;
   --border:rgba(99,102,241,.15);--border2:rgba(0,0,0,.06);
-  --glass:rgba(255,255,255,.82);--glass-border:rgba(99,102,241,.2);
-  --shadow:0 8px 32px rgba(0,0,0,.08);
+  --glass:rgba(255,255,255,.92);
 }
-html{scroll-behavior:smooth}
-body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;line-height:1.6}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;line-height:1.5}
+a{color:var(--cyan);text-decoration:none}
 
 /* Mesh bg */
-.mesh-bg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.4}
-.mesh-bg::before{content:'';position:absolute;inset:-50%;background:
-  radial-gradient(ellipse 600px 600px at 20% 30%,rgba(99,102,241,.12),transparent),
-  radial-gradient(ellipse 500px 500px at 80% 70%,rgba(6,182,212,.08),transparent),
-  radial-gradient(ellipse 400px 400px at 50% 50%,rgba(16,185,129,.06),transparent);
-  animation:meshMove 20s ease-in-out infinite alternate}
-@keyframes meshMove{0%{transform:translate(0,0)}100%{transform:translate(-30px,20px) rotate(3deg)}}
+.mesh-bg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.35}
+.mesh-bg::before{content:'';position:absolute;inset:-50%;
+  background:radial-gradient(ellipse 600px 600px at 20% 30%,rgba(99,102,241,.12),transparent),
+  radial-gradient(ellipse 500px 500px at 80% 70%,rgba(6,182,212,.08),transparent);
+  animation:mesh 20s ease-in-out infinite alternate}
+@keyframes mesh{0%{transform:translate(0,0)}100%{transform:translate(-30px,20px) rotate(3deg)}}
 
-.particles{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-.particle{position:absolute;width:2px;height:2px;background:var(--cyan);border-radius:50%;opacity:0;animation:float linear infinite}
-@keyframes float{0%{opacity:0;transform:translateY(100vh) scale(0)}10%{opacity:.5}90%{opacity:.5}100%{opacity:0;transform:translateY(-10vh) scale(1)}}
-
-.container{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:0 24px}
+.container{position:relative;z-index:1;max-width:1440px;margin:0 auto;padding:0 16px}
 
 /* Header */
-header{padding:16px 0;border-bottom:1px solid var(--border2);background:var(--glass);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100}
-.header-inner{display:flex;align-items:center;justify-content:space-between}
-.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;letter-spacing:-.5px}
-.logo-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--cyan),var(--accent));display:flex;align-items:center;justify-content:center;font-size:18px}
-.header-actions{display:flex;align-items:center;gap:10px}
-.header-btn{padding:8px 16px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);cursor:pointer;font-family:var(--font);font-weight:510;font-size:13px;transition:.2s;display:flex;align-items:center;gap:6px}
-.header-btn:hover{border-color:var(--accent);background:var(--accent-glow)}
-.theme-btn{width:40px;height:40px;padding:0;border-radius:10px;font-size:18px;display:flex;align-items:center;justify-content:center}
+header{padding:12px 0;border-bottom:1px solid var(--border2);background:var(--glass);backdrop-filter:blur(16px);position:sticky;top:0;z-index:100}
+.header-inner{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:18px;letter-spacing:-.3px;flex-shrink:0}
+.logo-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--cyan),var(--accent));display:flex;align-items:center;justify-content:center;font-size:16px}
+.hdr-actions{display:flex;gap:6px;flex-wrap:wrap}
+.hdr-btn{padding:6px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);color:var(--text);cursor:pointer;font-family:var(--font);font-weight:510;font-size:12px;transition:.2s;white-space:nowrap}
+.hdr-btn:hover{border-color:var(--cyan);background:rgba(6,182,212,.08)}
+.theme-btn{width:36px;height:36px;padding:0;font-size:16px;display:flex;align-items:center;justify-content:center}
 
 /* Hero */
-.hero{text-align:center;padding:64px 0 40px}
-.hero h1{font-size:clamp(32px,5vw,56px);font-weight:800;letter-spacing:-1.5px;line-height:1.1;margin-bottom:16px}
+.hero{text-align:center;padding:48px 0 24px}
+.hero h1{font-size:clamp(28px,5vw,48px);font-weight:800;letter-spacing:-1.5px;line-height:1.1;margin-bottom:12px}
 .hero h1 span{background:linear-gradient(135deg,var(--cyan),var(--accent),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hero p{font-size:17px;color:var(--text2);max-width:620px;margin:0 auto}
+.hero p{font-size:15px;color:var(--text2);max-width:560px;margin:0 auto}
 
-/* Stats bar */
-.stats-bar{display:flex;justify-content:center;gap:32px;padding:20px 0 40px;flex-wrap:wrap}
-.stat{text-align:center}
-.stat .num{font-size:28px;font-weight:800;letter-spacing:-1px;background:linear-gradient(135deg,var(--cyan),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.stat .label{font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+/* Stats */
+.stats{display:flex;justify-content:center;gap:24px;padding:16px 0 28px;flex-wrap:wrap}
+.stat-num{font-size:24px;font-weight:800;background:linear-gradient(135deg,var(--cyan),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-lbl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
 
 /* Main layout */
-.main-grid{display:grid;grid-template-columns:280px 1fr;gap:16px;margin-bottom:32px}
-@media(max-width:900px){.main-grid{grid-template-columns:1fr}}
+.main{display:grid;grid-template-columns:260px 1fr;gap:12px;margin-bottom:32px}
+@media(max-width:860px){.main{grid-template-columns:1fr}}
 
 /* Sidebar */
-.sidebar{display:flex;flex-direction:column;gap:12px}
-@media(max-width:900px){.sidebar{display:none}}
+.sidebar{display:flex;flex-direction:column;gap:10px}
+@media(max-width:860px){.sidebar{display:none}}
 .sidebar-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
-.sidebar-title{padding:12px 16px;font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between}
-.sidebar-title .badge{font-size:11px;background:var(--accent-glow);color:var(--accent2);padding:2px 8px;border-radius:10px}
-
-/* Collection list */
-.collection-list{padding:8px}
-.collection-item{padding:8px 12px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:space-between;transition:.15s}
-.collection-item:hover{background:var(--bg3)}
-.collection-item.active{background:var(--accent-glow);color:var(--accent2)}
-.collection-item .count{font-size:11px;color:var(--text3);background:var(--bg4);padding:1px 8px;border-radius:10px}
-
-/* Doc tree */
-.doc-tree{padding:8px}
-.doc-item{padding:6px 12px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;font-family:var(--mono);color:var(--text2);transition:.15s;display:flex;align-items:center;gap:8px}
+.side-title{padding:10px 14px;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between}
+.side-title .badge{font-size:10px;background:rgba(6,182,212,.12);color:var(--cyan);padding:2px 8px;border-radius:10px}
+.coll-list{padding:6px}
+.coll-item{padding:7px 10px;border-radius:6px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:space-between;transition:.15s}
+.coll-item:hover{background:var(--bg3)}
+.coll-item.active{background:rgba(6,182,212,.1);color:var(--cyan)}
+.coll-item .cnt{font-size:10px;color:var(--text3);background:var(--bg4);padding:1px 7px;border-radius:10px}
+.doc-list{padding:6px}
+.doc-item{padding:5px 10px;border-radius:6px;cursor:pointer;font-size:11px;font-family:var(--mono);color:var(--text2);transition:.15s}
 .doc-item:hover{background:var(--bg3);color:var(--text)}
-.doc-item.active{background:var(--accent-glow);color:var(--cyan)}
-.doc-icon{color:var(--text3);font-size:10px}
+.doc-item.active{background:rgba(6,182,212,.1);color:var(--cyan)}
+.schema-view{padding:10px 12px;font-family:var(--mono);font-size:11px;color:var(--text3);line-height:1.7}
+.schema-field{color:var(--pink)}.schema-type{color:var(--cyan)}
 
-/* Content area */
-.content-area{display:flex;flex-direction:column;gap:16px}
+/* Mobile collections */
+.mobile-coll{display:none;padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px}
+@media(max-width:860px){.mobile-coll{display:block}}
+.mobile-coll select{width:100%;padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;outline:none}
+
+/* Content */
+.content{display:flex;flex-direction:column;gap:10px;min-width:0}
 
 /* Query bar */
 .query-bar{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
-.query-tabs{display:flex;border-bottom:1px solid var(--border2);padding:0 16px}
-.query-tab{padding:10px 16px;font-size:13px;font-weight:510;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:.15s}
-.query-tab.active{color:var(--cyan);border-bottom-color:var(--cyan)}
-.query-tab:hover{color:var(--text)}
-.query-input-area{display:flex;gap:0}
-.query-input{flex:1;padding:14px 16px;background:transparent;border:none;color:var(--text);font-family:var(--mono);font-size:13px;outline:none;resize:none;min-height:44px}
-.query-input::placeholder{color:var(--text3)}
-.query-run{padding:10px 20px;background:var(--green);color:#fff;border:none;font-family:var(--font);font-weight:600;font-size:13px;cursor:pointer;transition:.15s;white-space:nowrap}
-.query-run:hover{background:#059669}
-.query-run:disabled{opacity:.4;cursor:not-allowed}
-.ai-suggest{padding:10px 16px;background:linear-gradient(135deg,var(--accent),var(--cyan));color:#fff;border:none;font-family:var(--font);font-weight:600;font-size:13px;cursor:pointer;white-space:nowrap;transition:.15s}
-.ai-suggest:hover{opacity:.9}
+.q-tabs{display:flex;border-bottom:1px solid var(--border2);overflow-x:auto;-webkit-overflow-scrolling:touch}
+.q-tab{padding:8px 14px;font-size:12px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;flex-shrink:0;transition:.15s}
+.q-tab.active{color:var(--cyan);border-bottom-color:var(--cyan)}
+.q-input-row{display:flex;gap:0}
+.q-input{flex:1;padding:12px 14px;background:transparent;border:none;color:var(--text);font-family:var(--mono);font-size:13px;outline:none;resize:none;min-height:42px}
+.q-input::placeholder{color:var(--text3)}
+.q-btn{padding:8px 16px;border:none;font-family:var(--font);font-weight:600;font-size:12px;cursor:pointer;white-space:nowrap;transition:.15s}
+.q-ai{background:linear-gradient(135deg,var(--accent),var(--cyan));color:#fff}
+.q-run{background:var(--green);color:#fff}
+.q-run:hover{background:#059669}
+.q-run:disabled{opacity:.4}
 
-/* Results area */
-.results-area{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;flex:1;min-height:400px}
-.results-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border2);background:var(--bg3)}
-.results-title{font-weight:600;font-size:13px;display:flex;align-items:center;gap:8px}
-.results-meta{font-size:11px;color:var(--text3)}
-.results-body{padding:0;overflow:auto;max-height:500px}
-.results-tabs{display:flex;gap:0;border-bottom:1px solid var(--border2)}
-.results-tab{padding:8px 16px;font-size:12px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent}
-.results-tab.active{color:var(--cyan);border-bottom-color:var(--cyan)}
+/* Results */
+.results{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;flex:1;min-height:300px}
+.res-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--border2);background:var(--bg3)}
+.res-title{font-weight:600;font-size:12px}
+.res-meta{font-size:11px;color:var(--text3)}
+.res-tabs{display:flex;border-bottom:1px solid var(--border2);overflow-x:auto}
+.res-tab{padding:7px 14px;font-size:11px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:.15s}
+.res-tab.active{color:var(--cyan);border-bottom-color:var(--cyan)}
+.res-body{overflow:auto;max-height:500px}
 
 /* JSON viewer */
-.json-viewer{padding:16px;font-family:var(--mono);font-size:12.5px;line-height:1.8;overflow-x:auto}
-.json-key{color:var(--pink)}
-.json-string{color:var(--green)}
-.json-number{color:var(--cyan)}
-.json-bool{color:var(--yellow)}
-.json-null{color:var(--text3)}
-.json-bracket{color:var(--text3)}
-.json-line{padding:1px 0;white-space:pre}
-.json-line:hover{background:var(--bg3);border-radius:2px}
+.json-view{padding:14px;font-family:var(--mono);font-size:12px;line-height:1.7;overflow-x:auto;white-space:pre-wrap;word-break:break-word}
+.jk{color:var(--pink)}.js{color:var(--green)}.jn{color:var(--cyan)}.jb{color:var(--yellow)}.jnul{color:var(--text3)}
+.jline{padding:1px 4px;border-radius:2px}
+.jline:hover{background:var(--bg3)}
 
-/* Table view */
+/* Table */
 .doc-table{width:100%;border-collapse:collapse;font-size:12px}
-.doc-table th{padding:8px 12px;text-align:left;background:var(--bg3);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);border-bottom:1px solid var(--border2);position:sticky;top:0}
-.doc-table td{padding:8px 12px;border-bottom:1px solid var(--border2);font-family:var(--mono);font-size:12px;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.doc-table th{padding:7px 10px;text-align:left;background:var(--bg3);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--text2);border-bottom:1px solid var(--border2);position:sticky;top:0}
+.doc-table td{padding:7px 10px;border-bottom:1px solid var(--border2);font-family:var(--mono);font-size:11px;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .doc-table tr:hover td{background:var(--bg3)}
 
-/* Aggregation pipeline viz */
-.pipeline-viz{padding:16px;display:flex;gap:8px;overflow-x:auto;align-items:center}
-.pipeline-stage{padding:10px 16px;background:var(--bg4);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:var(--mono);font-size:11px;white-space:nowrap;flex-shrink:0;position:relative}
-.pipeline-stage::after{content:'→';position:absolute;right:-14px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:14px}
-.pipeline-stage:last-child::after{display:none}
-.pipeline-stage .stage-name{color:var(--cyan);font-weight:600;font-size:10px;text-transform:uppercase;margin-bottom:4px}
-.pipeline-stage .stage-op{color:var(--text)}
+/* Pipeline */
+.pipeline{padding:14px;display:flex;gap:6px;overflow-x:auto;align-items:center}
+.pipe-stage{padding:8px 12px;background:var(--bg4);border:1px solid var(--border);border-radius:6px;font-family:var(--mono);font-size:10px;white-space:nowrap;flex-shrink:0;position:relative}
+.pipe-stage::after{content:'→';position:absolute;right:-12px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:13px}
+.pipe-stage:last-child::after{display:none}
+.pipe-name{color:var(--cyan);font-weight:600;text-transform:uppercase;margin-bottom:3px}
 
 /* Chat sidebar */
-.chat-panel{position:fixed;right:-420px;top:0;bottom:0;width:400px;background:var(--bg2);border-left:1px solid var(--border);z-index:200;transition:right .3s;display:flex;flex-direction:column;box-shadow:-8px 0 32px rgba(0,0,0,.3)}
-.chat-panel.open{right:0}
-.chat-header{padding:14px 16px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between}
-.chat-header span{font-weight:600;font-size:14px;display:flex;align-items:center;gap:8px}
-.chat-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px}
-.chat-messages{flex:1;overflow-y:auto;padding:16px}
-.chat-msg{margin-bottom:12px;padding:10px 14px;border-radius:var(--radius-sm);font-size:13px;line-height:1.6}
-.chat-msg.user{background:var(--accent);color:#fff;margin-left:40px}
-.chat-msg.ai{background:var(--bg3);color:var(--text);margin-right:20px}
-.chat-msg.ai code{background:var(--bg4);padding:1px 4px;border-radius:3px;font-size:12px;font-family:var(--mono)}
-.chat-msg.ai pre{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px;margin:8px 0;overflow-x:auto;font-size:12px;font-family:var(--mono)}
-.chat-input-area{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--border2)}
-.chat-input{flex:1;padding:10px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px;outline:none}
-.chat-input:focus{border-color:var(--cyan)}
-.chat-send{padding:10px 16px;border-radius:var(--radius-sm);border:none;background:var(--cyan);color:#fff;font-family:var(--font);font-weight:600;font-size:13px;cursor:pointer}
 .chat-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:199;display:none}
 .chat-overlay.open{display:block}
+.chat-panel{position:fixed;right:-100%;top:0;bottom:0;width:min(400px,90vw);background:var(--bg2);border-left:1px solid var(--border);z-index:200;transition:right .3s;display:flex;flex-direction:column;box-shadow:-8px 0 32px rgba(0,0,0,.3)}
+.chat-panel.open{right:0}
+.chat-hdr{padding:12px 14px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.chat-hdr span{font-weight:600;font-size:14px}
+.chat-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;padding:4px}
+.chat-msgs{flex:1;overflow-y:auto;padding:14px;-webkit-overflow-scrolling:touch}
+.chat-msg{margin-bottom:10px;padding:9px 12px;border-radius:var(--radius-sm);font-size:13px;line-height:1.5}
+.chat-msg.user{background:var(--accent);color:#fff;margin-left:40px}
+.chat-msg.ai{background:var(--bg3);color:var(--text);margin-right:20px}
+.chat-msg code{background:var(--bg4);padding:1px 4px;border-radius:3px;font-size:12px;font-family:var(--mono)}
+.chat-input-row{display:flex;gap:6px;padding:10px 14px;border-top:1px solid var(--border2);flex-shrink:0}
+.chat-input{flex:1;padding:9px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px;outline:none}
+.chat-input:focus{border-color:var(--cyan)}
+.chat-send{padding:9px 14px;border-radius:var(--radius-sm);border:none;background:var(--cyan);color:#fff;font-family:var(--font);font-weight:600;font-size:12px;cursor:pointer}
 
-/* AI query modal */
-.ai-modal{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.5)}
+/* AI modal */
+.ai-modal{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.5);padding:16px}
 .ai-modal.open{display:flex}
-.ai-modal-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;max-width:600px;width:90%;box-shadow:var(--shadow)}
-.ai-modal-card h3{font-size:18px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px}
-.ai-modal-card p{font-size:13px;color:var(--text2);margin-bottom:16px}
-.ai-modal-card textarea{width:100%;padding:12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;resize:vertical;min-height:80px;outline:none}
-.ai-modal-card textarea:focus{border-color:var(--cyan)}
-.ai-modal-actions{display:flex;gap:8px;margin-top:16px;justify-content:flex-end}
-.ai-modal-actions button{padding:8px 20px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg3);color:var(--text);font-family:var(--font);font-weight:510;font-size:13px;cursor:pointer}
-.ai-modal-actions .primary{background:var(--cyan);color:#fff;border-color:var(--cyan)}
-.ai-result{margin-top:16px;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:var(--mono);font-size:13px;display:none}
-.ai-result.visible{display:block}
-
-/* Footer */
-footer{text-align:center;padding:32px 0;color:var(--text3);font-size:13px;border-top:1px solid var(--border2)}
-footer a{color:var(--cyan);text-decoration:none}
+.ai-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;max-width:560px;width:100%}
+.ai-card h3{font-size:17px;font-weight:700;margin-bottom:4px}
+.ai-card p{font-size:13px;color:var(--text2);margin-bottom:14px}
+.ai-card textarea{width:100%;padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;resize:vertical;min-height:70px;outline:none}
+.ai-card textarea:focus{border-color:var(--cyan)}
+.ai-result{margin-top:12px;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:var(--mono);font-size:12px;display:none;overflow-x:auto;white-space:pre-wrap}
+.ai-result.show{display:block}
+.ai-actions{display:flex;gap:8px;margin-top:14px;justify-content:flex-end}
+.ai-actions button{padding:8px 18px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg3);color:var(--text);font-family:var(--font);font-weight:500;font-size:13px;cursor:pointer}
+.ai-actions .pri{background:var(--cyan);color:#fff;border-color:var(--cyan)}
 
 /* Toast */
-.toast{position:fixed;top:24px;right:24px;padding:12px 20px;border-radius:var(--radius-sm);background:var(--green);color:#fff;font-weight:500;font-size:14px;z-index:1000;transform:translateX(120%);transition:.3s}
+.toast{position:fixed;top:20px;right:20px;padding:10px 18px;border-radius:var(--radius-sm);background:var(--green);color:#fff;font-weight:500;font-size:13px;z-index:999;transform:translateX(120%);transition:.3s}
 .toast.show{transform:translateX(0)}
 .toast.err{background:var(--red)}
 
-/* Scrollbar */
-::-webkit-scrollbar{width:6px;height:6px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+footer{text-align:center;padding:28px 0;color:var(--text3);font-size:12px;border-top:1px solid var(--border2)}
 
-/* Mobile */
-.mobile-collections{display:none;padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:16px}
-.mobile-collections select{width:100%;padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px}
-@media(max-width:900px){.mobile-collections{display:block}}
+/* Scrollbar */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 </style>
 </head>
 <body>
 <div class="mesh-bg"></div>
-<div class="particles" id="particles"></div>
 
 <header>
-  <div class="container header-inner">
-    <div class="logo"><div class="logo-icon">🗄️</div><span>MiMoDB</span></div>
-    <div class="header-actions">
-      <button class="header-btn" onclick="openAiModal()">🤖 AI Query</button>
-      <button class="header-btn" onclick="toggleChat()">💬 MiMo</button>
-      <button class="header-btn theme-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
-    </div>
+<div class="container header-inner">
+  <div class="logo"><div class="logo-icon">🗄️</div><span>MiMoDB</span></div>
+  <div class="hdr-actions">
+    <button class="hdr-btn" onclick="openAi()">🤖 AI Query</button>
+    <button class="hdr-btn" onclick="toggleChat()">💬 MiMo</button>
+    <button class="hdr-btn theme-btn" onclick="togTheme()" id="themeBtn">🌙</button>
   </div>
+</div>
 </header>
 
 <main class="container">
-  <section class="hero">
-    <h1>Explore Data<br>with <span>AI Queries</span></h1>
-    <p>Visual JSON document explorer with MiMo-powered query generation. NoSQL meets natural language.</p>
-  </section>
+<section class="hero">
+  <h1>Explore Data<br>with <span>AI Queries</span></h1>
+  <p>Visual JSON document explorer with MiMo-powered query generation. NoSQL meets natural language.</p>
+</section>
 
-  <div class="stats-bar">
-    <div class="stat"><div class="num" id="statCollections">6</div><div class="label">Collections</div></div>
-    <div class="stat"><div class="num" id="statDocs">47</div><div class="label">Documents</div></div>
-    <div class="stat"><div class="num" id="statSize">2.4 MB</div><div class="label">Total Size</div></div>
-    <div class="stat"><div class="num" id="statIndexes">12</div><div class="label">Indexes</div></div>
+<div class="stats">
+  <div><div class="stat-num">6</div><div class="stat-lbl">Collections</div></div>
+  <div><div class="stat-num">47</div><div class="stat-lbl">Documents</div></div>
+  <div><div class="stat-num">2.4 MB</div><div class="stat-lbl">Total Size</div></div>
+  <div><div class="stat-num">12</div><div class="stat-lbl">Indexes</div></div>
+</div>
+
+<!-- Mobile collection selector -->
+<div class="mobile-coll">
+  <select id="mCollSel" onchange="pickColl(this.value)"></select>
+</div>
+
+<div class="main">
+  <!-- Sidebar (desktop) -->
+  <div class="sidebar">
+    <div class="sidebar-card">
+      <div class="side-title">Collections <span class="badge" id="collBadge">6</span></div>
+      <div class="coll-list" id="collList"></div>
+    </div>
+    <div class="sidebar-card">
+      <div class="side-title">Documents</div>
+      <div class="doc-list" id="docList"></div>
+    </div>
+    <div class="sidebar-card">
+      <div class="side-title">Schema</div>
+      <div class="schema-view" id="schemaView">Select a collection</div>
+    </div>
   </div>
 
-  <div class="mobile-collections">
-    <select id="mobileCollSelect" onchange="selectCollection(this.value)">
-      <option value="users">👤 users (12)</option>
-      <option value="products" selected>📦 products (8)</option>
-      <option value="orders">🛒 orders (15)</option>
-      <option value="analytics">📊 analytics (5)</option>
-      <option value="sessions">🔑 sessions (4)</option>
-      <option value="notifications">🔔 notifications (3)</option>
-    </select>
-  </div>
-
-  <div class="main-grid">
-    <!-- Sidebar -->
-    <div class="sidebar">
-      <div class="sidebar-card">
-        <div class="sidebar-title">Collections <span class="badge" id="collCount">6</span></div>
-        <div class="collection-list" id="collectionList"></div>
+  <!-- Content -->
+  <div class="content">
+    <div class="query-bar">
+      <div class="q-tabs">
+        <div class="q-tab active" onclick="setQTab(this,'filter')">🔍 Filter</div>
+        <div class="q-tab" onclick="setQTab(this,'aggregate')">⚡ Aggregate</div>
+        <div class="q-tab" onclick="setQTab(this,'raw')">📝 Raw</div>
       </div>
-      <div class="sidebar-card">
-        <div class="sidebar-title">Documents</div>
-        <div class="doc-tree" id="docTree"></div>
-      </div>
-      <div class="sidebar-card">
-        <div class="sidebar-title">Schema</div>
-        <div style="padding:12px;font-family:var(--mono);font-size:11px;color:var(--text3)" id="schemaView">
-          Select a collection to view schema
-        </div>
+      <div class="q-input-row">
+        <textarea class="q-input" id="qInput" rows="1" placeholder='{ "status": "active" }'></textarea>
+        <button class="q-btn q-ai" onclick="openAi()">🤖</button>
+        <button class="q-btn q-run" id="runBtn" onclick="runQuery()">▶ Run</button>
       </div>
     </div>
 
-    <!-- Content -->
-    <div class="content-area">
-      <div class="query-bar">
-        <div class="query-tabs">
-          <div class="query-tab active" onclick="setQueryTab(this,'filter')">🔍 Filter</div>
-          <div class="query-tab" onclick="setQueryTab(this,'aggregate')">⚡ Aggregate</div>
-          <div class="query-tab" onclick="setQueryTab(this,'raw')">📝 Raw Query</div>
-        </div>
-        <div class="query-input-area">
-          <textarea class="query-input" id="queryInput" placeholder='{ "status": "active", "age": { "$gte": 25 } }' rows="1"></textarea>
-          <button class="ai-suggest" onclick="openAiModal()">🤖 AI</button>
-          <button class="query-run" id="runBtn" onclick="runQuery()">▶ Run</button>
-        </div>
+    <div class="results">
+      <div class="res-header">
+        <div class="res-title">📄 Results</div>
+        <div class="res-meta" id="resMeta">—</div>
       </div>
-
-      <div class="results-area">
-        <div class="results-header">
-          <div class="results-title">📄 Results</div>
-          <div class="results-meta" id="resultsMeta">6 documents · 12ms</div>
-        </div>
-        <div class="results-tabs">
-          <div class="results-tab active" onclick="setResultTab(this,'json')">JSON</div>
-          <div class="results-tab" onclick="setResultTab(this,'table')">Table</div>
-          <div class="results-tab" onclick="setResultTab(this,'pipeline')">Pipeline</div>
-        </div>
-        <div class="results-body" id="resultsBody">
-          <div class="json-viewer" id="jsonViewer"></div>
-          <div id="tableView" style="display:none;overflow-x:auto"></div>
-          <div id="pipelineView" style="display:none"></div>
-        </div>
+      <div class="res-tabs">
+        <div class="res-tab active" onclick="setRTab(this,'json')">JSON</div>
+        <div class="res-tab" onclick="setRTab(this,'table')">Table</div>
+        <div class="res-tab" onclick="setRTab(this,'pipeline')">Pipeline</div>
+      </div>
+      <div class="res-body">
+        <div class="json-view" id="jsonView"></div>
+        <div id="tableView" style="display:none;overflow-x:auto"></div>
+        <div id="pipeView" style="display:none"></div>
       </div>
     </div>
   </div>
+</div>
 </main>
 
-<footer>
-  <p>MiMoDB — Powered by <a href="https://text.pollinations.ai" target="_blank">Xiaomi MiMo V2.5</a> via Pollinations.ai · Built for <a href="https://mimo.money" target="_blank">MiMo 100T Creator Program</a></p>
-</footer>
+<footer>MiMoDB — Powered by <a href="https://text.pollinations.ai" target="_blank">Xiaomi MiMo V2.5</a> · Built for <a href="https://mimo.money" target="_blank">MiMo 100T Creator Program</a></footer>
 
-<!-- Chat Panel -->
-<div class="chat-overlay" id="chatOverlay" onclick="toggleChat()"></div>
+<!-- Chat -->
+<div class="chat-overlay" id="chatOvl" onclick="toggleChat()"></div>
 <div class="chat-panel" id="chatPanel">
-  <div class="chat-header">
-    <span>🤖 Chat with MiMo</span>
-    <button class="chat-close" onclick="toggleChat()">✕</button>
+  <div class="chat-hdr"><span>🤖 Chat with MiMo</span><button class="chat-close" onclick="toggleChat()">✕</button></div>
+  <div class="chat-msgs" id="chatMsgs">
+    <div class="chat-msg ai">Hey! I'm MiMo 👋 Ask me to generate queries, explain data, or help you explore. Try: <code>Show users with purchases > 10</code></div>
   </div>
-  <div class="chat-messages" id="chatMessages">
-    <div class="chat-msg ai">Hey! I'm MiMo 👋 Ask me to generate queries, explain data, suggest aggregations, or help you explore your database. Try: <code>Show me all orders from last week with total > $100</code></div>
-  </div>
-  <div class="chat-input-area">
-    <input class="chat-input" id="chatInput" placeholder="Ask MiMo about your data..." onkeydown="if(event.key==='Enter')sendChat()">
+  <div class="chat-input-row">
+    <input class="chat-input" id="chatIn" placeholder="Ask MiMo about your data..." onkeydown="if(event.key==='Enter')sendChat()">
     <button class="chat-send" onclick="sendChat()">Send</button>
   </div>
 </div>
 
-<!-- AI Query Modal -->
+<!-- AI Modal -->
 <div class="ai-modal" id="aiModal">
-  <div class="ai-modal-card">
+  <div class="ai-card">
     <h3>🤖 AI Query Generator</h3>
     <p>Describe what you want in plain English. MiMo will generate the query.</p>
-    <textarea id="aiPrompt" placeholder="e.g., Find all users who signed up last month and made more than 3 purchases"></textarea>
-    <div class="ai-result" id="aiResult"></div>
-    <div class="ai-modal-actions">
-      <button onclick="closeAiModal()">Cancel</button>
-      <button class="primary" onclick="generateAiQuery()">✨ Generate Query</button>
+    <textarea id="aiIn" placeholder="e.g., Find active users who made more than 5 purchases"></textarea>
+    <div class="ai-result" id="aiRes"></div>
+    <div class="ai-actions">
+      <button onclick="closeAi()">Cancel</button>
+      <button class="pri" onclick="genAi()">✨ Generate</button>
     </div>
   </div>
 </div>
@@ -330,330 +289,195 @@ footer a{color:var(--cyan);text-decoration:none}
 <div class="toast" id="toast"></div>
 
 <script>
-// === Config ===
-const API = 'https://text.pollinations.ai/openai';
+const API='https://text.pollinations.ai/openai';
 
-// === Theme ===
-function toggleTheme(){
-  const b=document.body,d=b.getAttribute('data-theme')!=='light';
-  b.setAttribute('data-theme',d?'light':'dark');
-  document.getElementById('themeBtn').textContent=d?'☀️':'🌙';
-  localStorage.setItem('theme',d?'light':'dark');
-}
+// Theme
+function togTheme(){const b=document.body,d=b.getAttribute('data-theme')!=='light';b.setAttribute('data-theme',d?'light':'dark');document.getElementById('themeBtn').textContent=d?'☀️':'🌙';localStorage.setItem('theme',d?'light':'dark')}
 (function(){const t=localStorage.getItem('theme')||'dark';document.body.setAttribute('data-theme',t);document.getElementById('themeBtn').textContent=t==='light'?'☀️':'🌙'})();
 
-// === Particles ===
-(function(){const c=document.getElementById('particles');for(let i=0;i<25;i++){const p=document.createElement('div');p.className='particle';p.style.left=Math.random()*100+'%';p.style.animationDuration=(8+Math.random()*12)+'s';p.style.animationDelay=Math.random()*10+'s';c.appendChild(p)}})();
-
-// === Sample Data ===
-const DB = {
-  users: {
-    count: 12,
-    schema: { _id: 'ObjectId', name: 'string', email: 'string', age: 'number', status: 'string', createdAt: 'Date', purchases: 'number', tags: 'string[]' },
-    docs: [
-      { _id:'u001',name:'Arya Pratama',email:'arya@example.com',age:28,status:'active',createdAt:'2026-01-15T08:30:00Z',purchases:12,tags:['vip','early-adopter'] },
-      { _id:'u002',name:'Sari Dewi',email:'sari@example.com',age:34,status:'active',createdAt:'2026-02-20T14:15:00Z',purchases:8,tags:['premium'] },
-      { _id:'u003',name:'Budi Santoso',email:'budi@example.com',age:22,status:'inactive',createdAt:'2026-03-01T09:00:00Z',purchases:1,tags:['trial'] },
-      { _id:'u004',name:'Maya Chen',email:'maya@example.com',age:31,status:'active',createdAt:'2026-01-28T11:45:00Z',purchases:25,tags:['vip','beta-tester'] },
-      { _id:'u005',name:'Rizal Hakim',email:'rizal@example.com',age:27,status:'active',createdAt:'2026-04-10T16:20:00Z',purchases:5,tags:['referral'] },
-      { _id:'u006',name:'Lina Wijaya',email:'lina@example.com',age:29,status:'suspended',createdAt:'2026-02-14T10:00:00Z',purchases:3,tags:['flagged'] },
-    ]
-  },
-  products: {
-    count: 8,
-    schema: { _id:'ObjectId',name:'string',category:'string',price:'number',stock:'number',rating:'number',tags:'string[]',createdAt:'Date' },
-    docs: [
-      { _id:'p001',name:'Mechanical Keyboard RGB',category:'electronics',price:89.99,stock:150,rating:4.7,tags:['gaming','peripheral'],createdAt:'2026-01-10T00:00:00Z' },
-      { _id:'p002',name:'Ergonomic Mouse Pro',category:'electronics',price:49.99,stock:320,rating:4.5,tags:['office','wireless'],createdAt:'2026-01-12T00:00:00Z' },
-      { _id:'p003',name:'USB-C Hub 7-in-1',category:'electronics',price:34.99,stock:200,rating:4.3,tags:['accessory','usb-c'],createdAt:'2026-02-01T00:00:00Z' },
-      { _id:'p004',name:'Monitor Light Bar',category:'electronics',price:59.99,stock:80,rating:4.8,tags:['office','led'],createdAt:'2026-02-15T00:00:00Z' },
-      { _id:'p005',name:'Desk Mat XXL',category:'accessories',price:24.99,stock:500,rating:4.6,tags:['gaming','desk'],createdAt:'2026-03-01T00:00:00Z' },
-      { _id:'p006',name:'Webcam 4K HDR',category:'electronics',price:129.99,stock:45,rating:4.4,tags:['streaming','video'],createdAt:'2026-03-10T00:00:00Z' },
-      { _id:'p007',name:'Cable Management Kit',category:'accessories',price:14.99,stock:800,rating:4.2,tags:['desk','organization'],createdAt:'2026-04-01T00:00:00Z' },
-      { _id:'p008',name:'Laptop Stand Aluminum',category:'accessories',price:44.99,stock:180,rating:4.9,tags:['office','ergonomic'],createdAt:'2026-04-15T00:00:00Z' },
-    ]
-  },
-  orders: {
-    count: 15,
-    schema: { _id:'ObjectId',userId:'string',items:'object[]',total:'number',status:'string',createdAt:'Date' },
-    docs: [
-      { _id:'o001',userId:'u001',items:[{pid:'p001',qty:1},{pid:'p005',qty:2}],total:139.97,status:'delivered',createdAt:'2026-04-01T10:00:00Z' },
-      { _id:'o002',userId:'u002',items:[{pid:'p004',qty:1}],total:59.99,status:'shipped',createdAt:'2026-04-15T14:30:00Z' },
-      { _id:'o003',userId:'u004',items:[{pid:'p006',qty:1},{pid:'p002',qty:2}],total:229.97,status:'processing',createdAt:'2026-04-20T09:15:00Z' },
-      { _id:'o004',userId:'u001',items:[{pid:'p003',qty:3}],total:104.97,status:'delivered',createdAt:'2026-03-15T11:00:00Z' },
-      { _id:'o005',userId:'u005',items:[{pid:'p007',qty:5},{pid:'p008',qty:1}],total:119.94,status:'pending',createdAt:'2026-04-22T16:45:00Z' },
-    ]
-  },
-  analytics: { count:5, schema:{_id:'ObjectId',event:'string',page:'string',userId:'string',timestamp:'Date'}, docs:[
-    {_id:'a001',event:'page_view',page:'/products',userId:'u001',timestamp:'2026-04-22T10:00:00Z'},
-    {_id:'a002',event:'add_to_cart',page:'/products/p001',userId:'u004',timestamp:'2026-04-22T10:05:00Z'},
-    {_id:'a003',event:'checkout',page:'/checkout',userId:'u002',timestamp:'2026-04-22T11:30:00Z'},
-  ]},
-  sessions: { count:4, schema:{_id:'ObjectId',userId:'string',device:'string',ip:'string',startedAt:'Date'}, docs:[
-    {_id:'s001',userId:'u001',device:'Chrome/Mac',ip:'103.45.67.89',startedAt:'2026-04-22T08:00:00Z'},
-    {_id:'s002',userId:'u004',device:'Safari/iPhone',ip:'115.23.45.67',startedAt:'2026-04-22T09:30:00Z'},
-  ]},
-  notifications: { count:3, schema:{_id:'ObjectId',userId:'string',type:'string',message:'string',read:'boolean'}, docs:[
-    {_id:'n001',userId:'u001',type:'order_shipped',message:'Your order o001 has been shipped!',read:true},
-    {_id:'n002',userId:'u002',type:'promo',message:'20% off all electronics this weekend!',read:false},
-  ]}
+// Data
+const DB={
+users:{count:12,schema:{_id:'ObjectId',name:'string',email:'string',age:'number',status:'string',createdAt:'Date',purchases:'number',tags:'string[]'},docs:[
+  {_id:'u001',name:'Arya Pratama',email:'arya@mail.com',age:28,status:'active',createdAt:'2026-01-15',purchases:12,tags:['vip','early-adopter']},
+  {_id:'u002',name:'Sari Dewi',email:'sari@mail.com',age:34,status:'active',createdAt:'2026-02-20',purchases:8,tags:['premium']},
+  {_id:'u003',name:'Budi Santoso',email:'budi@mail.com',age:22,status:'inactive',createdAt:'2026-03-01',purchases:1,tags:['trial']},
+  {_id:'u004',name:'Maya Chen',email:'maya@mail.com',age:31,status:'active',createdAt:'2026-01-28',purchases:25,tags:['vip','beta-tester']},
+  {_id:'u005',name:'Rizal Hakim',email:'rizal@mail.com',age:27,status:'active',createdAt:'2026-04-10',purchases:5,tags:['referral']},
+  {_id:'u006',name:'Lina Wijaya',email:'lina@mail.com',age:29,status:'suspended',createdAt:'2026-02-14',purchases:3,tags:['flagged']},
+]},
+products:{count:8,schema:{_id:'ObjectId',name:'string',category:'string',price:'number',stock:'number',rating:'number'},docs:[
+  {_id:'p001',name:'Mechanical Keyboard RGB',category:'electronics',price:89.99,stock:150,rating:4.7},
+  {_id:'p002',name:'Ergonomic Mouse Pro',category:'electronics',price:49.99,stock:320,rating:4.5},
+  {_id:'p003',name:'USB-C Hub 7-in-1',category:'electronics',price:34.99,stock:200,rating:4.3},
+  {_id:'p004',name:'Monitor Light Bar',category:'electronics',price:59.99,stock:80,rating:4.8},
+  {_id:'p005',name:'Desk Mat XXL',category:'accessories',price:24.99,stock:500,rating:4.6},
+  {_id:'p006',name:'Webcam 4K HDR',category:'electronics',price:129.99,stock:45,rating:4.4},
+  {_id:'p007',name:'Cable Management Kit',category:'accessories',price:14.99,stock:800,rating:4.2},
+  {_id:'p008',name:'Laptop Stand Aluminum',category:'accessories',price:44.99,stock:180,rating:4.9},
+]},
+orders:{count:15,schema:{_id:'ObjectId',userId:'string',items:'object[]',total:'number',status:'string',createdAt:'Date'},docs:[
+  {_id:'o001',userId:'u001',items:[{pid:'p001',qty:1},{pid:'p005',qty:2}],total:139.97,status:'delivered',createdAt:'2026-04-01'},
+  {_id:'o002',userId:'u002',items:[{pid:'p004',qty:1}],total:59.99,status:'shipped',createdAt:'2026-04-15'},
+  {_id:'o003',userId:'u004',items:[{pid:'p006',qty:1},{pid:'p002',qty:2}],total:229.97,status:'processing',createdAt:'2026-04-20'},
+  {_id:'o004',userId:'u001',items:[{pid:'p003',qty:3}],total:104.97,status:'delivered',createdAt:'2026-03-15'},
+  {_id:'o005',userId:'u005',items:[{pid:'p007',qty:5},{pid:'p008',qty:1}],total:119.94,status:'pending',createdAt:'2026-04-22'},
+]},
+analytics:{count:5,schema:{_id:'ObjectId',event:'string',page:'string',userId:'string',timestamp:'Date'},docs:[
+  {_id:'a001',event:'page_view',page:'/products',userId:'u001',timestamp:'2026-04-22T10:00:00Z'},
+  {_id:'a002',event:'add_to_cart',page:'/products/p001',userId:'u004',timestamp:'2026-04-22T10:05:00Z'},
+  {_id:'a003',event:'checkout',page:'/checkout',userId:'u002',timestamp:'2026-04-22T11:30:00Z'},
+]},
+sessions:{count:4,schema:{_id:'ObjectId',userId:'string',device:'string',ip:'string',startedAt:'Date'},docs:[
+  {_id:'s001',userId:'u001',device:'Chrome/Mac',ip:'103.45.67.89',startedAt:'2026-04-22T08:00:00Z'},
+  {_id:'s002',userId:'u004',device:'Safari/iPhone',ip:'115.23.45.67',startedAt:'2026-04-22T09:30:00Z'},
+]},
+notifications:{count:3,schema:{_id:'ObjectId',userId:'string',type:'string',message:'string',read:'boolean'},docs:[
+  {_id:'n001',userId:'u001',type:'order_shipped',message:'Your order o001 has been shipped!',read:true},
+  {_id:'n002',userId:'u002',type:'promo',message:'20% off all electronics this weekend!',read:false},
+]}
 };
 
-let currentCollection = 'products';
-let currentDoc = null;
-let currentQueryTab = 'filter';
+let curColl='products',curDoc=null,qTab='filter';
 
-// === Render sidebar ===
-function renderCollections() {
-  const el = document.getElementById('collectionList');
-  const icons = {users:'👤',products:'📦',orders:'🛒',analytics:'📊',sessions:'🔑',notifications:'🔔'};
-  el.innerHTML = Object.entries(DB).map(([k,v]) =>
-    `<div class="collection-item ${k===currentCollection?'active':''}" onclick="selectCollection('${k}')">
-      <span>${icons[k]||'📁'} ${k}</span><span class="count">${v.count}</span>
-    </div>`
+// Render
+function render(){
+  const icons={users:'👤',products:'📦',orders:'🛒',analytics:'📊',sessions:'🔑',notifications:'🔔'};
+  // Sidebar coll list
+  document.getElementById('collList').innerHTML=Object.entries(DB).map(([k,v])=>
+    `<div class="coll-item ${k===curColl?'active':''}" onclick="pickColl('${k}')"><span>${icons[k]||'📁'} ${k}</span><span class="cnt">${v.count}</span></div>`
   ).join('');
-}
-
-function renderDocTree() {
-  const el = document.getElementById('docTree');
-  const docs = DB[currentCollection]?.docs || [];
-  el.innerHTML = docs.map((d,i) =>
-    `<div class="doc-item ${currentDoc===i?'active':''}" onclick="selectDoc(${i})">
-      <span class="doc-icon">📄</span> ${d._id}
-    </div>`
+  // Mobile select
+  const ms=document.getElementById('mCollSel');
+  ms.innerHTML=Object.entries(DB).map(([k,v])=>`<option value="${k}" ${k===curColl?'selected':''}>${icons[k]||'📁'} ${k} (${v.count})</option>`).join('');
+  // Doc list
+  const docs=DB[curColl]?.docs||[];
+  document.getElementById('docList').innerHTML=docs.map((d,i)=>
+    `<div class="doc-item ${curDoc===i?'active':''}" onclick="pickDoc(${i})">📄 ${d._id}</div>`
   ).join('');
+  // Schema
+  const sch=DB[curColl]?.schema||{};
+  document.getElementById('schemaView').innerHTML=Object.entries(sch).map(([k,v])=>
+    `<span class="schema-field">${k}</span>: <span class="schema-type">${v}</span>`
+  ).join('<br>');
+  // Results
+  showDocs(docs);
 }
 
-function renderSchema() {
-  const schema = DB[currentCollection]?.schema || {};
-  const el = document.getElementById('schemaView');
-  el.innerHTML = Object.entries(schema).map(([k,v]) =>
-    `<div style="margin-bottom:4px"><span style="color:var(--pink)">${k}</span>: <span style="color:var(--cyan)">${v}</span></div>`
-  ).join('');
+function pickColl(name){curColl=name;curDoc=null;render()}
+function pickDoc(i){curDoc=i;const docs=DB[curColl]?.docs||[];showDocs([docs[i]]);document.querySelectorAll('.doc-item').forEach((e,j)=>e.classList.toggle('active',j===i))}
+
+// JSON highlight
+function hlJson(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+  .replace(/"([^"]+)":/g,'<span class="jk">"$1"</span>:')
+  .replace(/: "([^"]*?)"/g,': <span class="js">"$1"</span>')
+  .replace(/: (\d+\.?\d*)/g,': <span class="jn">$1</span>')
+  .replace(/: (true|false)/g,': <span class="jb">$1</span>')
+  .replace(/: (null)/g,': <span class="jnul">$1</span>')}
+
+function showDocs(docs){
+  // JSON
+  document.getElementById('jsonView').innerHTML=docs.map(d=>'<div class="jline">'+hlJson(JSON.stringify(d,null,2))+'</div>').join('\n');
+  // Table
+  if(!docs.length){document.getElementById('tableView').innerHTML='<p style="padding:16px;color:var(--text3)">No documents</p>';return}
+  const keys=[...new Set(docs.flatMap(d=>Object.keys(d)))];
+  document.getElementById('tableView').innerHTML=`<table class="doc-table"><thead><tr>${keys.map(k=>`<th>${k}</th>`).join('')}</tr></thead><tbody>${docs.map(d=>`<tr>${keys.map(k=>`<td>${d[k]===undefined?'—':typeof d[k]==='object'?JSON.stringify(d[k]):String(d[k])}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  // Pipeline
+  document.getElementById('pipeView').innerHTML=`<div class="pipeline"><div class="pipe-stage"><div class="pipe-name">$match</div>{"collection":"${curColl}"}</div><div class="pipe-stage"><div class="pipe-name">$filter</div>{"docs":${docs.length}}</div><div class="pipe-stage"><div class="pipe-name">$project</div>{"fields":"*"}</div><div class="pipe-stage"><div class="pipe-name">$limit</div>{"count":${docs.length}}</div><div class="pipe-stage"><div class="pipe-name">$out</div>{"result":"✅"}</div></div>`;
+  document.getElementById('resMeta').textContent=`${docs.length} document${docs.length!==1?'s':''} · ${Math.floor(Math.random()*18+2)}ms`;
 }
 
-function selectCollection(name) {
-  currentCollection = name;
-  currentDoc = null;
-  renderCollections();
-  renderDocTree();
-  renderSchema();
-  renderJsonViewer(DB[name].docs);
-  updateMeta(DB[name].docs.length);
-  // Update mobile select
-  const ms = document.getElementById('mobileCollSelect');
-  if(ms) ms.value = name;
+// Query tabs
+function setQTab(el,t){qTab=t;document.querySelectorAll('.q-tab').forEach(e=>e.classList.remove('active'));el.classList.add('active');
+  const ph={filter:'{ "status": "active" }',aggregate:'[{ "$match": { "status": "active" } }]',raw:'db.users.find({ status: "active" }).limit(10)'};
+  document.getElementById('qInput').placeholder=ph[t]}
+
+// Result tabs
+function setRTab(el,t){document.querySelectorAll('.res-tab').forEach(e=>e.classList.remove('active'));el.classList.add('active');
+  document.getElementById('jsonView').style.display=t==='json'?'block':'none';
+  document.getElementById('tableView').style.display=t==='table'?'block':'none';
+  document.getElementById('pipeView').style.display=t==='pipeline'?'block':'none'}
+
+// Run query
+function runQuery(){
+  const q=document.getElementById('qInput').value.trim();
+  if(!q){showDocs(DB[curColl].docs);toast('Showing all documents');return}
+  try{
+    let f=JSON.parse(q);
+    let docs=DB[curColl].docs.filter(doc=>matchFilter(doc,f));
+    showDocs(docs);toast(`${docs.length} result${docs.length!==1?'s':''}`);
+  }catch(e){toast('Invalid JSON — try: { "status": "active" }',1)}
 }
 
-function selectDoc(idx) {
-  currentDoc = idx;
-  renderDocTree();
-  const doc = DB[currentCollection].docs[idx];
-  renderJsonViewer([doc]);
-  updateMeta(1);
-}
-
-// === JSON Viewer ===
-function renderJsonViewer(data) {
-  const el = document.getElementById('jsonViewer');
-  el.innerHTML = highlightJson(JSON.stringify(data, null, 2));
-  // Also update table view
-  renderTableView(data);
-}
-
-function highlightJson(str) {
-  return str.split('\n').map(line => {
-    let html = line
-      .replace(/"([^"]+)":/g, '<span class="json-key">"$1"</span>:')
-      .replace(/: "([^"]+)"/g, ': <span class="json-string">"$1"</span>')
-      .replace(/: (\d+\.?\d*)/g, ': <span class="json-number">$1</span>')
-      .replace(/: (true|false)/g, ': <span class="json-bool">$1</span>')
-      .replace(/: (null)/g, ': <span class="json-null">$1</span>')
-      .replace(/([{}\[\]])/g, '<span class="json-bracket">$1</span>');
-    return `<div class="json-line">${html}</div>`;
-  }).join('');
-}
-
-function renderTableView(data) {
-  if(!data.length) return;
-  const keys = [...new Set(data.flatMap(d => Object.keys(d)))];
-  const el = document.getElementById('tableView');
-  el.innerHTML = `<table class="doc-table"><thead><tr>${keys.map(k=>`<th>${k}</th>`).join('')}</tr></thead><tbody>${data.map(d=>`<tr>${keys.map(k=>`<td>${typeof d[k]==='object'?JSON.stringify(d[k]):(d[k]??'—')}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
-}
-
-function updateMeta(count) {
-  document.getElementById('resultsMeta').textContent = `${count} document${count!==1?'s':''} · ${Math.floor(Math.random()*20+3)}ms`;
-}
-
-// === Query tabs ===
-function setQueryTab(el, tab) {
-  currentQueryTab = tab;
-  document.querySelectorAll('.query-tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
-  const qi = document.getElementById('queryInput');
-  const placeholders = {
-    filter: '{ "status": "active", "age": { "$gte": 25 } }',
-    aggregate: '[{ "$match": { "status": "active" } }, { "$group": { "_id": "$category", "count": { "$sum": 1 } } }]',
-    raw: 'db.users.find({ status: "active" }).sort({ createdAt: -1 }).limit(10)'
-  };
-  qi.placeholder = placeholders[tab];
-}
-
-// === Result tabs ===
-function setResultTab(el, tab) {
-  document.querySelectorAll('.results-tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('jsonViewer').style.display = tab==='json'?'block':'none';
-  document.getElementById('tableView').style.display = tab==='table'?'block':'none';
-  document.getElementById('pipelineView').style.display = tab==='pipeline'?'block':'none';
-}
-
-// === Run query (simulated) ===
-function runQuery() {
-  const q = document.getElementById('queryInput').value.trim();
-  if(!q) {
-    // Show all docs in current collection
-    renderJsonViewer(DB[currentCollection].docs);
-    updateMeta(DB[currentCollection].docs.length);
-    return;
-  }
-
-  // Simple filter simulation
-  try {
-    let filter = JSON.parse(q);
-    let docs = DB[currentCollection].docs.filter(doc => {
-      return Object.entries(filter).every(([k,v]) => {
-        if(typeof v === 'object' && v !== null) {
-          if(v.$gte !== undefined) return doc[k] >= v.$gte;
-          if(v.$gt !== undefined) return doc[k] > v.$gt;
-          if(v.$lte !== undefined) return doc[k] <= v.$lte;
-          if(v.$lt !== undefined) return doc[k] < v.$lt;
-          if(v.$ne !== undefined) return doc[k] !== v.$ne;
-          if(v.$in !== undefined) return v.$in.includes(doc[k]);
-          return true;
-        }
-        return doc[k] === v;
-      });
-    });
-    renderJsonViewer(docs);
-    updateMeta(docs.length);
-    showToast(`Query returned ${docs.length} result${docs.length!==1?'s':''}`);
-  } catch(e) {
-    showToast('Invalid JSON filter — try: { "status": "active" }', true);
-  }
-}
-
-// === AI Modal ===
-function openAiModal() { document.getElementById('aiModal').classList.add('open'); }
-function closeAiModal() { document.getElementById('aiModal').classList.remove('open'); document.getElementById('aiResult').classList.remove('visible'); }
-
-async function generateAiQuery() {
-  const prompt = document.getElementById('aiPrompt').value.trim();
-  if(!prompt) return;
-  const btn = document.querySelector('.ai-modal-actions .primary');
-  btn.textContent = '⏳ Generating...';
-  btn.disabled = true;
-
-  const schema = JSON.stringify(DB[currentCollection]?.schema || {});
-  const collection = currentCollection;
-
-  try {
-    const resp = await fetch(API, {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model: 'openai',
-        messages: [
-          {role:'system', content:`You are MiMoDB AI. Generate a MongoDB-style JSON filter or aggregation pipeline query based on the user's request. Collection: ${collection}, Schema: ${schema}. Output ONLY valid JSON — no explanation, no markdown code blocks.`},
-          {role:'user', content: prompt}
-        ],
-        temperature: 0.3,
-        max_tokens: 500
-      })
-    });
-    const data = await resp.json();
-    let query = data.choices?.[0]?.message?.content?.trim() || '';
-    query = query.replace(/^```json?\n?/i, '').replace(/\n?```$/i, '').trim();
-
-    const resultEl = document.getElementById('aiResult');
-    resultEl.innerHTML = highlightJson(query);
-    resultEl.classList.add('visible');
-
-    // Auto-fill query input
-    document.getElementById('queryInput').value = query;
-  } catch(e) {
-    showToast('AI query failed: '+e.message, true);
-  } finally {
-    btn.textContent = '✨ Generate Query';
-    btn.disabled = false;
-  }
-}
-
-// === Chat ===
-function toggleChat() {
-  document.getElementById('chatPanel').classList.toggle('open');
-  document.getElementById('chatOverlay').classList.toggle('open');
-}
-
-async function sendChat() {
-  const input = document.getElementById('chatInput');
-  const msg = input.value.trim();
-  if(!msg) return;
-  input.value = '';
-
-  const messages = document.getElementById('chatMessages');
-  messages.innerHTML += `<div class="chat-msg user">${esc(msg)}</div>`;
-  messages.scrollTop = messages.scrollHeight;
-
-  const coll = currentCollection;
-  const docs = JSON.stringify((DB[coll]?.docs||[]).slice(0,3));
-  const schema = JSON.stringify(DB[coll]?.schema||{});
-
-  try {
-    const resp = await fetch(API, {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model: 'openai',
-        messages: [
-          {role:'system', content:`You are MiMo, an AI database assistant for MiMoDB. Current collection: ${coll}. Schema: ${schema}. Sample docs: ${docs}. Help the user query, understand, and explore their data. Be concise. When generating queries, output valid JSON filters.`},
-          {role:'user', content: msg}
-        ],
-        temperature: 0.5,
-        max_tokens: 1000
-      })
-    });
-    const data = await resp.json();
-    const reply = data.choices?.[0]?.message?.content || 'Sorry, something went wrong.';
-    messages.innerHTML += `<div class="chat-msg ai">${esc(reply).replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\n/g,'<br>')}</div>`;
-    messages.scrollTop = messages.scrollHeight;
-
-    // If reply contains JSON, try to apply it
-    const jsonMatch = reply.match(/\{[^{}]+\}/);
-    if(jsonMatch) {
-      try {
-        JSON.parse(jsonMatch[0]);
-        document.getElementById('queryInput').value = jsonMatch[0];
-      } catch(e){}
+function matchFilter(doc,filter){
+  if(Array.isArray(filter)){return filter.every(f=>matchFilter(doc,f))}
+  return Object.entries(filter).every(([k,v])=>{
+    if(k.startsWith('$')){
+      if(k==='$and')return v.every(f=>matchFilter(doc,f));
+      if(k==='$or')return v.some(f=>matchFilter(doc,f));
+      return true;
     }
-  } catch(e) {
-    messages.innerHTML += `<div class="chat-msg ai" style="color:var(--red)">Error: ${esc(e.message)}</div>`;
-  }
+    if(typeof v==='object'&&v!==null&&!Array.isArray(v)){
+      return Object.entries(v).every(([op,val])=>{
+        if(op==='$gte')return doc[k]>=val;
+        if(op==='$gt')return doc[k]>val;
+        if(op==='$lte')return doc[k]<=val;
+        if(op==='$lt')return doc[k]<val;
+        if(op==='$ne')return doc[k]!==val;
+        if(op==='$in')return val.includes(doc[k]);
+        if(op==='$nin')return !val.includes(doc[k]);
+        if(op==='$regex')return new RegExp(val,'i').test(doc[k]);
+        if(op==='$exists')return val?(doc[k]!==undefined):(doc[k]===undefined);
+        return true;
+      });
+    }
+    if(Array.isArray(v))return v.includes(doc[k]);
+    return doc[k]===v;
+  });
 }
 
-function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-// === Toast ===
-function showToast(m,e) {
-  const t=document.getElementById('toast');t.textContent=m;t.className='toast show'+(e?' err':'');setTimeout(()=>t.classList.remove('show'),3000);
+// Chat
+function toggleChat(){document.getElementById('chatPanel').classList.toggle('open');document.getElementById('chatOvl').classList.toggle('open')}
+async function sendChat(){
+  const inp=document.getElementById('chatIn'),msg=inp.value.trim();if(!msg)return;inp.value='';
+  const el=document.getElementById('chatMsgs');
+  el.innerHTML+=`<div class="chat-msg user">${esc(msg)}</div>`;el.scrollTop=el.scrollHeight;
+  const schema=JSON.stringify(DB[curColl]?.schema||{}),sample=JSON.stringify((DB[curColl]?.docs||[]).slice(0,2));
+  try{
+    const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'openai',messages:[
+      {role:'system',content:`You are MiMo, AI database assistant. Collection: ${curColl}. Schema: ${schema}. Sample: ${sample}. Be concise. Generate JSON filters when asked.`},
+      {role:'user',content:msg}
+    ],temperature:.5,max_tokens:800})});
+    const d=await r.json(),reply=d.choices?.[0]?.message?.content||'Error';
+    el.innerHTML+=`<div class="chat-msg ai">${esc(reply).replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\n/g,'<br>')}</div>`;el.scrollTop=el.scrollHeight;
+    const jm=reply.match(/\{[^{}]+\}/);if(jm){try{JSON.parse(jm[0]);document.getElementById('qInput').value=jm[0]}catch(e){}}
+  }catch(e){el.innerHTML+=`<div class="chat-msg ai" style="color:var(--red)">Error: ${esc(e.message)}</div>`}
 }
 
-// === Init ===
-renderCollections();
-renderDocTree();
-renderSchema();
-renderJsonViewer(DB.products.docs);
-updateMeta(DB.products.docs.length);
+// AI Modal
+function openAi(){document.getElementById('aiModal').classList.add('open')}
+function closeAi(){document.getElementById('aiModal').classList.remove('open');document.getElementById('aiRes').classList.remove('show')}
+async function genAi(){
+  const p=document.getElementById('aiIn').value.trim();if(!p)return;
+  const btn=document.querySelector('.ai-actions .pri');btn.textContent='⏳...';btn.disabled=true;
+  const schema=JSON.stringify(DB[curColl]?.schema||{});
+  try{
+    const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'openai',messages:[
+      {role:'system',content:`Generate a MongoDB-style JSON filter for collection "${curColl}". Schema: ${schema}. Output ONLY valid JSON, no markdown, no explanation.`},
+      {role:'user',content:p}
+    ],temperature:.3,max_tokens:300})});
+    const d=await r.json();let q=d.choices?.[0]?.message?.content?.trim()||'';
+    q=q.replace(/^```json?\n?/i,'').replace(/\n?```$/i,'').trim();
+    document.getElementById('aiRes').innerHTML=hlJson(q);document.getElementById('aiRes').classList.add('show');
+    document.getElementById('qInput').value=q;
+  }catch(e){toast('AI failed: '+e.message,1)}
+  finally{btn.textContent='✨ Generate';btn.disabled=false}
+}
+
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function toast(m,e){const t=document.getElementById('toast');t.textContent=m;t.className='toast show'+(e?' err':'');setTimeout(()=>t.classList.remove('show'),3000)}
+
+// Init
+render();
 </script>
 </body>
 </html>
